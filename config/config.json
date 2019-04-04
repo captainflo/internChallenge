@@ -1,0 +1,22 @@
+{
+  "development": {
+    "username": "root",
+    "password": "root",
+    "port": 8889,
+    "dialect": "sqlite",
+    "storage": "./database.sqlite3",
+    "logging": false
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "dialect": "sqlite"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "dialect": "sqlite",
+    "storage": "./database.sqlite3",
+    "logging": false
+  }
+}
