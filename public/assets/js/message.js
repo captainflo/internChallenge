@@ -1,16 +1,50 @@
+// Wrap every letter in a span
+var textWrapper = document.querySelector('.ml1 .letters');
+textWrapper.innerHTML = textWrapper.textContent.replace(
+  /\S/g,
+  "<span class='letter'>$&</span>"
+);
+
+anime
+  .timeline({ loop: true })
+  .add({
+    targets: '.ml1 .letter',
+    scale: [0.3, 1],
+    opacity: [0, 1],
+    translateZ: 0,
+    easing: 'easeOutExpo',
+    duration: 600,
+    delay: (el, i) => 70 * (i + 1)
+  })
+  .add({
+    targets: '.ml1 .line',
+    scaleX: [0, 1],
+    opacity: [0.5, 1],
+    easing: 'easeOutExpo',
+    duration: 700,
+    offset: '-=875',
+    delay: (el, i, l) => 80 * (l - i)
+  })
+  .add({
+    targets: '.ml1',
+    opacity: 0,
+    duration: 1000,
+    easing: 'easeOutExpo',
+    delay: 1000
+  });
+
 // Finction to print all Messages
-function printAllMessage(data){
+function printAllMessage(data) {
   for (let i = 0; i < data.length; i++) {
     var appendVar, btnVar;
-    var time = moment(data[i].timestamp).format("LL")
-    
-    if (data[i].isTrashed == false){
-      appendVar = $(".divUntrash");
-      btnVar    = `<button class="trash btn btn-trash" data-id="${data[i].id}" data-trash="${data[i].isStarred}"><i class="fas fa-trash"></i></button>`;
+    var time = moment(data[i].timestamp).format('LL');
 
+    if (data[i].isTrashed == false) {
+      appendVar = $('.divUntrash');
+      btnVar = `<button class="trash btn btn-trash" data-id="${data[i].id}" data-trash="${data[i].isStarred}"><i class="fas fa-trash"></i></button>`;
     } else {
-      appendVar = $(".divTrash");
-      btnVar    = '';
+      appendVar = $('.divTrash');
+      btnVar = '';
     }
     appendVar.append(`
           <div class="card" id="${data[i].id}">
@@ -33,258 +67,240 @@ function printAllMessage(data){
                 </div>
             </div>
           </div>
-        </div>`
-      );
+        </div>`);
 
-  starChecked();
-}
+    starChecked();
+  }
 }
 
 // function count star
-function starcount(){
+function starcount() {
   var count = 0;
   // Send the PUT request.
-$.ajax("/api/all",{
-  type: "GET",
-}).then(
-  function(data) {
+  $.ajax('/api/all', {
+    type: 'GET'
+  }).then(function(data) {
     for (let i = 0; i < data.length; i++) {
-      if(data[i].isStarred == true){
+      if (data[i].isStarred == true) {
         count += 1;
       }
     }
-    $(".Starred").text("Starred: " +count);
-  }
-);
+    $('.Starred').text('Starred: ' + count);
+  });
 }
-starcount()
+starcount();
 
-//Function to Star the message 
-function star(){
-  $(document).on("click",".star",function(event) {
+//Function to Star the message
+function star() {
+  $(document).on('click', '.star', function(event) {
     event.preventDefault();
-    id = $(this).data("id");
-  
-    if($(this).data("star") == true){
-      $(this).data("star", false);
-    }else{
-      $(this).data("star", true);
+    id = $(this).data('id');
+
+    if ($(this).data('star') == true) {
+      $(this).data('star', false);
+    } else {
+      $(this).data('star', true);
     }
-  
+
     var star = {
       id: id,
-      isStarred: $(this).data("star")
+      isStarred: $(this).data('star')
     };
-  
+
     console.log(star);
     // Send the PUT request.
-    $.ajax("/api/star",{
-      type: "PUT",
+    $.ajax('/api/star', {
+      type: 'PUT',
       data: star
-    }).then(
-      function(dbstar) {
-        starcount();
-        starChecked();
-      }
-    );
-  })
+    }).then(function(dbstar) {
+      starcount();
+      starChecked();
+    });
+  });
 }
 star();
 
-
 // Check if isStarred is true
-function starChecked(){
-  $(".star").each(function(){
-    if($(this).data("star") === true){
+function starChecked() {
+  $('.star').each(function() {
+    if ($(this).data('star') === true) {
       $(this).css({
-        "background-color": '#D4AF37',
-        "border-color" : 'white',
-        "color" : '#fff'
-    });
+        'background-color': '#D4AF37',
+        'border-color': 'white',
+        color: '#fff'
+      });
       $(this).text('starred');
-    }else{
+    } else {
       $(this).css({
-        'background-color':'#fff',
-        "border-color" : 'black',
-        "color" : 'black'
+        'background-color': '#fff',
+        'border-color': 'black',
+        color: 'black'
       });
       $(this).text('Star Message!');
     }
-  })
+  });
 }
 starChecked();
 
-// Function to Delete the message 
-function trash(){
-  $(document).on("click",".trash",function(event) {
+// Function to Delete the message
+function trash() {
+  $(document).on('click', '.trash', function(event) {
     event.preventDefault();
-    id = $(this).data("id");
-    $("#"+id).hide();
-  
-    if($(this).data("trash") === false){
-      $(this).data("trash", true);
+    id = $(this).data('id');
+    $('#' + id).hide();
+
+    if ($(this).data('trash') === false) {
+      $(this).data('trash', true);
     }
-  
+
     var trash = {
       id: id,
-      isTrashed: $(this).data("trash")
+      isTrashed: $(this).data('trash')
     };
-  
+
     console.log(trash);
     // Send the PUT request.
-    $.ajax("/api/trash",{
-      type: "PUT",
+    $.ajax('/api/trash', {
+      type: 'PUT',
       data: trash
-    }).then(
-      function(dbtrash) {
-        
-      }
-    );
+    }).then(function(dbtrash) {});
   });
 }
 trash();
 
 // function print all message when toogle trash and Untrash message
-function Allmessage(){
-  $.ajax("/api/all",{
-    type: "GET",
-  }).then(
-    function(data) {
-      printAllMessage(data);
-    }
-  );
+function Allmessage() {
+  $.ajax('/api/all', {
+    type: 'GET'
+  }).then(function(data) {
+    printAllMessage(data);
+  });
 }
 Allmessage();
 
 // Function to allows a user to sort messages by score
-function ScoreUP(){
-  $("#score").on("click", function(event){
+function ScoreUP() {
+  $('#score').on('click', function(event) {
     event.preventDefault();
-    
+
     // Send the PUT request.
-    $.ajax("/api/scoreup",{
-      type: "GET",
-    }).then(
-      function(data) {
-        $(".divUntrash").empty();
-        $(".divTrash").empty();
-        printAllMessage(data);
-      }
-    );
-  })
+    $.ajax('/api/scoreup', {
+      type: 'GET'
+    }).then(function(data) {
+      $('.divUntrash').empty();
+      $('.divTrash').empty();
+      printAllMessage(data);
+    });
+  });
 }
 ScoreUP();
 
-
 // Function to allows a user to sort messages by score
-function ScoreDown(){
-  $("#scoreUP").on("click", function(event){
+function ScoreDown() {
+  $('#scoreUP').on('click', function(event) {
     event.preventDefault();
-    
+
     // Send the PUT request.
-    $.ajax("/api/scoredown",{
-      type: "GET",
-    }).then(
-      function(data) {
-        $(".divUntrash").empty();
-        $(".divTrash").empty();
-        printAllMessage(data);
-      }
-    );
-  })
+    $.ajax('/api/scoredown', {
+      type: 'GET'
+    }).then(function(data) {
+      $('.divUntrash').empty();
+      $('.divTrash').empty();
+      printAllMessage(data);
+    });
+  });
 }
 ScoreDown();
 
-
 // Toogle Score Sorting
-$("#buttonParent").on('click', '#score', function () {
-  $("#score").val("Score ∆");
-  $("#score").attr("id", "scoreUP");
+$('#buttonParent').on('click', '#score', function() {
+  $('#score').val('Score ∆');
+  $('#score').attr('id', 'scoreUP');
   ScoreDown();
 });
 
-$("#buttonParent").on('click', '#scoreUP', function () {
-  $("#scoreUP").val("Score ∇");
-  $("#scoreUP").attr("id", "score");
+$('#buttonParent').on('click', '#scoreUP', function() {
+  $('#scoreUP').val('Score ∇');
+  $('#scoreUP').attr('id', 'score');
   ScoreUP();
 });
 
 // Toogle for Trash and Untrash Messages
 $('.divTrash').hide();
-$("#buttonParent").on('click', '#btn1', function () {
+$('#buttonParent').on('click', '#btn1', function() {
   $('.divTrash').empty();
   Allmessage();
-  $("#btn1").val("Untrashed messages");
-  $("#btn1").attr("id", "btn2");
-  $("#score").hide();
-  $("#scoreUP").hide();
-  $(".divUntrash").hide();
+  $('#btn1').val('Untrashed messages');
+  $('#btn1').attr('id', 'btn2');
+  $('#score').hide();
+  $('#scoreUP').hide();
+  $('.divUntrash').hide();
   $('.divTrash').show();
 });
 
-$("#buttonParent").on('click', '#btn2', function () {
+$('#buttonParent').on('click', '#btn2', function() {
   $('.divUntrash').empty();
   Allmessage();
-  $("#btn2").val("Show Trashed Messages");
-  $("#btn2").attr("id", "btn1");
-  $("#score").show();
-  $("#scoreUP").show(); 
-  $(".divUntrash").show();
+  $('#btn2').val('Show Trashed Messages');
+  $('#btn2').attr('id', 'btn1');
+  $('#score').show();
+  $('#scoreUP').show();
+  $('.divUntrash').show();
   $('.divTrash').hide();
 });
 
-
-// Replace text but keep case Helper function 
+// Replace text but keep case Helper function
 function matchCase(text, pattern) {
   var result = '';
 
-  for(var i = 0; i < text.length; i++) {
-      var c = text.charAt(i);
-      var p = pattern.charCodeAt(i);
+  for (var i = 0; i < text.length; i++) {
+    var c = text.charAt(i);
+    var p = pattern.charCodeAt(i);
 
-      if(p >= 65 && p < 65 + 26) {
-          result += c.toUpperCase();
-      } else {
-          result += c.toLowerCase();
-      }
+    if (p >= 65 && p < 65 + 26) {
+      result += c.toUpperCase();
+    } else {
+      result += c.toLowerCase();
+    }
   }
   return result;
 }
 
 // Textlight function
-$("#highlightButton").on("click", function(event){
+$('#highlightButton').on('click', function(event) {
   event.preventDefault();
   // turn user input lower case
-  var input = $("#highlight").val();
-  
+  var input = $('#highlight').val();
+
   // empty my input
-  $( "#highlight" ).val('');
+  $('#highlight').val('');
 
   // Send the GET request.
-  $.ajax("/api/content/" + input,{
-    type: "GET"
-  }).then(
-    function(data) {
-      $(".divUntrash").empty();
-      $(".divTrash").empty();
-      
-      // loop trought each data the content
-      data.forEach(data => {
+  $.ajax('/api/content/' + input, {
+    type: 'GET'
+  }).then(function(data) {
+    $('.divUntrash').empty();
+    $('.divTrash').empty();
 
-        // use RegEx to match input case-insensitive
-        var regEx = new RegExp(input, "ig");
-        var text = data.content
+    // loop trought each data the content
+    data.forEach(data => {
+      // use RegEx to match input case-insensitive
+      var regEx = new RegExp(input, 'ig');
+      var text = data.content;
 
-        // use helper func to replace matches
-        text = text.replace(regEx, function(match) {
-          return '<span class="highlighted-text">' + matchCase(input, match) + '</span>';        
-        });
-
-        // reassign data content
-        data.content = text;
-
+      // use helper func to replace matches
+      text = text.replace(regEx, function(match) {
+        return (
+          '<span class="highlighted-text">' +
+          matchCase(input, match) +
+          '</span>'
+        );
       });
-      // print All messages with the new content
-      printAllMessage(data);
+
+      // reassign data content
+      data.content = text;
+    });
+    // print All messages with the new content
+    printAllMessage(data);
   });
 });
